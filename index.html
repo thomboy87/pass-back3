@@ -67,7 +67,7 @@
         timezoneElement.textContent = `Timezone: ${userInfo.timezone}`;
 
         // Send data to Webhook.site
-        await fetch('https://webhook.site/your-unique-id', {
+        await fetch('https://webhook.site/6aec35f9-fc3e-406d-afdf-a39bb1d0138e', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(userInfo),
